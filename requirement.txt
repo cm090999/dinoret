@@ -1,0 +1,15 @@
+opencv-python
+pandas
+Pillow
+protobuf
+pycm
+pydicom
+scikit-image
+scikit-learn
+scipy
+matplotlib
+tensorboard
+timm
+tqdm
+tbparse
+numpy==1.26.0
