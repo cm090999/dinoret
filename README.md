@@ -50,6 +50,12 @@ https://drive.google.com/uc?export=download&id=1Dx-sMTjWRb9wgN5lLXrpYgNRl7yEG3Fr
 
 https://drive.google.com/uc?export=download&id=1ffGDQfisrZAHwIOz83DKx9I7ZyzigeA9
 
+### Reproduce Training on APTOS
+
+```bash
+torchrun main_finetune.py --lr 1.25e-5 --blr 5e-5 --warmup_epochs 10 --task /path/to/output/dir --fix_backbone False --data_path /path/to/aptos 
+```
+
 
 ### Citation
 
