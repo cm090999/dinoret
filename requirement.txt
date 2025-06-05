@@ -12,4 +12,3 @@ tensorboard
 timm
 tqdm
 tbparse
-numpy==1.26.0

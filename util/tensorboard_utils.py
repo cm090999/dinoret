@@ -400,8 +400,9 @@ def save_wrong_images(args, results_raw, log_writer, data_loader_test, max_saved
         fig.canvas.draw()
 
         # Convert the figure to numpy array, read the pixel values and reshape the array
-        img = np.fromstring(fig.canvas.tostring_rgb(), dtype=np.uint8, sep='')
-        img = img.reshape(fig.canvas.get_width_height()[::-1] + (3,))
+        img = np.fromstring(fig.canvas.tostring_argb(), dtype=np.uint8, sep='')
+        img = img.reshape(fig.canvas.get_width_height()[::-1] + (4,))
+        img = img[:,:,0:2]
 
         # Save figure to tensorboard
         log_writer.add_figure(f'wrong_images/{img_path_rel[i]}', fig, 0)
@@ -421,8 +422,9 @@ def visualize_augmentations(args, data_loader_train, log_writer, max_saved = 30)
         fig.canvas.draw()
 
         # Convert the figure to numpy array, read the pixel values and reshape the array
-        img = np.fromstring(fig.canvas.tostring_rgb(), dtype=np.uint8, sep='')
-        img = img.reshape(fig.canvas.get_width_height()[::-1] + (3,))
+        img = np.fromstring(fig.canvas.tostring_argb(), dtype=np.uint8, sep='')
+        img = img.reshape(fig.canvas.get_width_height()[::-1] + (4,))
+        img = img[:,:,0:2]
 
         # Save figure to tensorboard
         log_writer.add_figure(f'train_images/{i}', fig, 0)

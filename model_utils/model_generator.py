@@ -58,7 +58,7 @@ class LoadModel():
             )
 
             if self.args.pretrained_checkpoint != '':
-                checkpoint = torch.load(self.args.pretrained_checkpoint, map_location='cpu')
+                checkpoint = torch.load(self.args.pretrained_checkpoint, map_location='cpu', weights_only=False)
                 checkpoint_model = checkpoint['model']
 
                 # Check if the model is trained with DINOv2 by checking if the keys contain 'teacher'
