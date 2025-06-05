@@ -186,7 +186,7 @@ def run_test_evaluation(args,model,device,data_loader_test,criterion,epoch, mode
     torch.distributed.barrier()
     #Load best model and evaluate on test set using distributed data parallel
     if not args.eval:
-        checkpoint = torch.load(model_path, map_location='cpu')
+        checkpoint = torch.load(model_path, map_location='cpu', weights_only=False)
         best_epoch = checkpoint['epoch']
         print(f"Load pre-trained checkpoint from: {model_path} Best result was at epoch {best_epoch}")
         checkpoint_model = checkpoint['model']
