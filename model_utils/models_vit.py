@@ -90,6 +90,7 @@ class Dinov2_Vit(nn.Module):
                 alpha=kwargs['lora_adaptation_alpha'],
                 adapt_attention=kwargs['lora_adaptation_adapt_attention'],
                 adapt_mlp=kwargs['lora_adaptation_adapt_mlp'],
+                freeze_non_lora=False
             )
 
         self.head = ClassificationHead(
