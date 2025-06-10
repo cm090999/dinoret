@@ -6,6 +6,7 @@
 from functools import partial
 from model_utils.classification_head import ClassificationHead
 from model_utils.block_exansion import expand_dinov2
+from model_utils.lora_adaptation import apply_lora_to_dinov2
 
 import torch
 import torch.nn as nn
@@ -80,7 +81,17 @@ class Dinov2_Vit(nn.Module):
         if kwargs['block_expansion_positions'] is not None:
             print("Additional layers are added!")
             self.backbone = expand_dinov2(self.backbone, kwargs['block_expansion_positions'], kwargs['block_expansion_path_dropout'])
-            
+
+        if kwargs['lora_adaptation'] == True:
+            self.backbone = apply_lora_to_dinov2(
+                self.backbone,
+                target_blocks=kwargs['lora_adaptation_target_blocks'],
+                rank=kwargs['lora_adaptation_rank'],
+                alpha=kwargs['lora_adaptation_alpha'],
+                adapt_attention=kwargs['lora_adaptation_adapt_attention'],
+                adapt_mlp=kwargs['lora_adaptation_adapt_mlp'],
+            )
+
         self.head = ClassificationHead(
             in_features = in_features,
             num_classes = kwargs['num_classes'],

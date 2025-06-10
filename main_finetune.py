@@ -170,6 +170,14 @@ def get_args_parser():
     parser.add_argument('--block_expansion_weight_decay', default=None, type=float)
     parser.add_argument('--block_expansion_path_dropout', default=0.0, type=float)
 
+    # LoRA adaptation parameters
+    parser.add_argument('--lora_adaptation', default=False, type=str2bool, help='If True, LoRA adaptation is applied to the model')
+    parser.add_argument('--lora_adaptation_rank', default=8, type=int, help='Rank of LoRA adaptation')
+    parser.add_argument('--lora_adaptation_alpha', default=16, type=int, help='Alpha of LoRA adaptation')
+    parser.add_argument('--lora_adaptation_target_blocks', type=none_or_int, default=[0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11], help='List of blocks to apply LoRA adaptation to')
+    parser.add_argument('--lora_adaptation_adapt_attention', default=True, type=str2bool, help='If True, LoRA adaptation is applied to the attention layers')
+    parser.add_argument('--lora_adaptation_adapt_mlp', default=True, type=str2bool, help='If True, LoRA adaptation is applied to the MLP layers')
+
     # Pretraining Parameters
     parser.add_argument('--yaml_config', default=None, type=none_or_str, help='Path to yaml config file')
 
