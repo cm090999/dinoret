@@ -54,10 +54,30 @@ class LoadModel():
                 drop_path_rate=self.args.drop_path,
                 n_classification_heads = self.args.n_classification_heads,
                 block_expansion_positions = self.args.block_expansion_positions,
-                block_expansion_path_dropout = self.args.block_expansion_path_dropout
+                block_expansion_path_dropout = self.args.block_expansion_path_dropout,
+                lora_adaptation = self.args.lora_adaptation,
+                lora_adaptation_target_blocks = self.args.lora_adaptation_target_blocks,
+                lora_adaptation_rank = self.args.lora_adaptation_rank,
+                lora_adaptation_alpha = self.args.lora_adaptation_alpha,
+                lora_adaptation_adapt_attention = self.args.lora_adaptation_adapt_attention,
+                lora_adaptation_adapt_mlp = self.args.lora_adaptation_adapt_mlp,
             )
 
-            if self.args.pretrained_checkpoint != '':
+            if "hf:" in self.args.pretrained_checkpoint:
+                from huggingface_hub import hf_hub_download
+
+                # url structure: hf:repo:filename
+                repo, filename = self.args.pretrained_checkpoint.split(':')[1:]
+
+                local_checkpoint_path = hf_hub_download(repo_id=repo, filename=filename)
+                checkpoint = torch.load(local_checkpoint_path, map_location='cpu', weights_only=False)
+
+                checkpoint_model = interpolate_pos_embed(model.backbone, checkpoint)
+
+                print("Load pre-trained checkpoint from HuggingFace: %s" % self.args.pretrained_checkpoint)
+                model.backbone.load_state_dict(checkpoint_model)
+
+            elif self.args.pretrained_checkpoint != '':
                 checkpoint = torch.load(self.args.pretrained_checkpoint, map_location='cpu', weights_only=False)
                 checkpoint_model = checkpoint['model']
 

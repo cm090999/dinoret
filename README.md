@@ -11,51 +11,81 @@ For running the pretraining for DINOv2 and the block expanded version, please re
 - Finetuning scripts for BE-DINOv2 and DINOv2 for retinal images
 - RETFound finetuning and inference scripts
 
-### Install environment
+## Installing the Environment
 
-Our experiments were done locally on an Ubuntu 22.04 LTS computer.
+**System Requirements:** Ubuntu 22.04 LTS
 
-1. Create environment:
+### Installation Steps
 
-```
-bash scripts/create_env.sh
-```
+1. **Create Environment**
+   
+   Choose the appropriate setup script based on your hardware:
+   
+   - **Standard setup:**
+     ```bash
+     bash scripts/create_env.sh
+     ```
+   
+   - **GH200 compatibility:**
+     ```bash
+     bash scripts/create_env_gh200.sh
+     ```
+     > Note: Use this alternative if you're developing on a GH200, which is incompatible with the standard torch version.
 
-2. Activate environment:
-```
-source .env/bin/activate
-```
+2. **Activate Environment**
+   ```bash
+   source .env/bin/activate
+   ```
 
-
-3. Run distributed experiment
+## Available Datasets
 
 There is a dataloader that support the following dataset in their respective original structure after download: [aptos](https://www.kaggle.com/competitions/aptos2019-blindness-detection) [eyepacs](https://www.kaggle.com/competitions/diabetic-retinopathy-detection/data), [idrid](https://ieee-dataport.org/open-access/indian-diabetic-retinopathy-image-dataset-idrid), [messidor](https://www.adcis.net/en/third-party/messidor2/), [drtid](https://github.com/fdu-vts/drtid), [papila](https://figshare.com/articles/dataset/PAPILA/14798004/1?file=28454352)
 
-The flag ```task``` defines the output folder for the results. Ensure that this folder exists before launching a training run.
+## Pretrained Weights
 
-To use BE DINORET, add the flag ```--block_expansion_positions "1 2 3"``` along with the path to the downloaded weights ```--pretrained_checkpoint /path/to/BEDINOERET```. ```"1 2 3"``` adds transformer blocks after the 1st, 2nd and 3rd original transformer block. As the weights are loaded from the pretrained BE DINORET, the positions do not matter, only 3 blocks need to be added.  
+We provide the pre-trained encoder weights of our domain-adapted models on Huggingface: [`cmerk/dinoret`](https://huggingface.co/cmerk/dinoret). We provide weights for DINORET, BE-DINORET and LoRA-DINORET. 
 
-```
- torchrun main_finetune.py --data_path /path/to/dataset --task results/
-```
+ - DINORET: ```"hf:cmerk/dinoret:dinoret.pth"```
+ - BE-DINORET: ```"hf:cmerk/dinoret:bedinoret.pth"```
+ - LoRA-DINORET: ```"hf:cmerk/dinoret:loradinoret.pth"```
 
-### Weights
 
-We provide the weights of DINORET and BE DINORET on a google drive share:
+## Running Experiments
 
-- DINORET (based on DINOv2 base):
 
-https://drive.google.com/uc?export=download&id=1Dx-sMTjWRb9wgN5lLXrpYgNRl7yEG3Fr
-- BE DINORET (DINOv2 base with 3 expanded blocks):
+**Finetuning experiments on APTOS:**
 
-https://drive.google.com/uc?export=download&id=1ffGDQfisrZAHwIOz83DKx9I7ZyzigeA9
-
-### Reproduce Training on APTOS
-
+- **DINOv2 ViT-b** - Baseline DINOv2 ViT-b
 ```bash
-torchrun main_finetune.py --lr 1.25e-5 --blr 5e-5 --warmup_epochs 10 --task /path/to/output/dir --fix_backbone False --data_path /path/to/aptos 
+torchrun main_finetune.py --task /path/to/output/dir --data_path /path/to/aptos --lr 1.25e-5 --blr 5e-5 --warmup_epochs 10 --fix_backbone False --pretrained_checkpoint ''
 ```
 
+- **DINORET** - Domain adapted DINOv2 ViT-b (DINORET)
+```bash
+torchrun main_finetune.py --task /path/to/output/dir --data_path /path/to/aptos --lr 1.25e-5 --blr 5e-5 --warmup_epochs 10 --fix_backbone False --pretrained_checkpoint hf:cmerk/dinoret:dinoret.pth
+```
+
+- **BE-DINORET** - Domain adapted DINOv2 ViT-b using block expansion (BE-DINORET)
+```bash
+torchrun main_finetune.py --task /path/to/output/dir --data_path /path/to/aptos --lr 1.25e-5 --blr 5e-5 --warmup_epochs 10 --fix_backbone False --block_expansion_positions "3 7 11" --pretrained_checkpoint hf:cmerk/dinoret:bedinoret.pth
+```
+
+- **LoRA-DINORET** - Domain adapted DINOv2 ViT-b using LoRA (LoRA-DINORET)
+```bash
+torchrun main_finetune.py --task /path/to/output/dir --data_path /path/to/aptos --lr 1.25e-5 --blr 5e-5 --warmup_epochs 10 --fix_backbone False --lora_adaptation True --pretrained_checkpoint hf:cmerk/dinoret:loradinoret.pth
+```
+
+**Key Arguments**
+
+| Argument | Description | Default |
+|----------|-------------|---------|
+| `--data_path` | Path to the dataset | Required |
+| `--task` | Output location | Required |
+| `--fix_backbone` | Whether the encoder backbone weights are frozen or not | True |
+| `--block_expansion_positions` | Block Positions of the expanded Blocks | None |
+| `--lora_adaptation` | Enable LoRA adaptation for training | False |
+| `--model` | Model encoder architecture to use | dinov2_vitb14 |
+| `--pretrained_checkpoint` | Path or HF URL with encoder weights **only encoder** | '' |
 
 ### Citation
 
